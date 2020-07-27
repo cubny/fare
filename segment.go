@@ -2,7 +2,6 @@ package fairestimation
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -36,9 +35,8 @@ func NewSegment(p1, p2 Position) (Segment, error) {
 	}, nil
 }
 
-func (s Segment) String() string {
-	fair := s.FairEst()
-	return fmt.Sprintf("distance: %f, duration:%f, speed: %f, fair: %f", s.distance, s.duration.Seconds(), s.speed, fair)
+func (s Segment) RideID() int {
+	return s.p1.RideID
 }
 
 func (s Segment) FairEst() Price {
