@@ -16,3 +16,6 @@ vendor/
 
 .idea
 data/
+cpuprofile
+memprofile
+cmd/repeator
