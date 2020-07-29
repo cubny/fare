@@ -1,4 +1,4 @@
-#Fare Estimator
+### Fare Estimator
 _Fare_ is a command line program that estimates the fare of rides. 
 A ride consists of a series of positions. The program, tries to make a  
 path out of the given geo locations and calculates the fare of each ride
@@ -12,12 +12,12 @@ The output is a comma separated text file, each line of the file is of the form
 of `id_ride, fare_amount`. 
 	
 
-##How to Run it
+## How to Run it
 ```shell script
 ./bin/fare -input data/paths.csv -output fares.csv -c 5
 ```
 
-###Usage
+### Usage
 ````
 Usage of fare:
   -c int
@@ -29,7 +29,7 @@ Usage of fare:
 ````
 
 
-##Assumptions I made
+## Assumptions I made
 - this program is designed for big input files (few GB)
 - in calculation of segment's fare, I assumed it is timely short enough
 that we don't need to break the Segment to two pieces like "before midnight" and
@@ -38,7 +38,7 @@ that we don't need to break the Segment to two pieces like "before midnight" and
 - based on the example data, the number of positions for each ride is less than few hundreds 
 
 
-##Architecure
+## Architecure
 This solution is heavily based on pipeline patterns. It consists of two pipelines: main (estimator.go), ride (ride.go)
 The main reads and writes records from and to csv files. the stream records are then group by a transformer stage into 
 records of a rideID. After that, they are published them into a channel. the consumer of this channel, is a worker pool, 
@@ -99,7 +99,7 @@ Segment type.
                                                    +----------------------+                           
 
 
-##Shortcomings of my solution
+## Shortcomings of my solution
 -  I used the csv package, assuming it makes good use of buffers. later when profiling I noticed that the 
 most resource consuming part is IO read, I didn't have the time to test other solutions like `bufio.Scanner`.
 - I sacrificed some performance improvements for better code readability, including using empty interface to make it 
@@ -111,7 +111,7 @@ files, since the burden is on GC.
 - Although I am sure queueing improves performance, but because of the issue above, I didn't get to find the right stage
 to make use of it. After all, the bottleneck is not in the rest of the flow, so optimisation could only add to complexity.
 
-##Making it scalable and some extra features
+## Making it scalable and some extra features
 - using pools for objects such as Segment and Position would be beneficial. 
 - reading from a file is not nice, anything other than files can lift the main burden off IO
 - any type of database sql/nosql/newsql can help remove a few steps.
