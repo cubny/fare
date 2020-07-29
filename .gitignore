@@ -20,3 +20,4 @@ cpuprofile
 memprofile
 cmd/repeator
 *csv
+bin/

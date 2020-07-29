@@ -15,7 +15,7 @@ const maxSpeed = 100
 func main() {
 	infile := flag.String("input", "", "input csv file path")
 	outfile := flag.String("output", "fares.csv", "output csv file path")
-	concurrency := flag.Int("workers", 2, "concurrent workers")
+	concurrency := flag.Int("c", 5, "concurrent workers")
 	flag.Parse()
 
 	in, err := os.Open(*infile)
@@ -66,5 +66,6 @@ func main() {
 	}()
 
 	<-exit
-	fmt.Println("exit")
+	fmt.Printf("output is written to %s\n", *outfile)
+	fmt.Println("exit.")
 }
