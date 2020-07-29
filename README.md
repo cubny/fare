@@ -1,4 +1,4 @@
-### Fare Estimator
+# Fare Estimator
 _Fare_ is a command line program that estimates the fare of rides. 
 A ride consists of a series of positions. The program, tries to make a  
 path out of the given geo locations and calculates the fare of each ride
