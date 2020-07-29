@@ -14,6 +14,7 @@ of `id_ride, fare_amount`.
 
 ## How to Run it
 ```shell script
+make build
 ./bin/fare -input data/paths.csv -output fares.csv -c 5
 ```
 
