@@ -1,26 +1,20 @@
-package fairestimation
+package fare
 
 import (
-	"fmt"
-	"github.com/cubny/fair-estimation/internal/haversine"
 	"strconv"
 	"time"
+
+	"github.com/cubny/fare/internal/haversine"
 )
 
+// Position holds the geo coordinates of a ride in specific time
 type Position struct {
 	RideID    int
 	Lat, Long float64
 	Timestamp time.Time
 }
 
-func (p Position) String() string {
-	return fmt.Sprintf("RideID:%d Lat:%f Long:%f Timestamp:%s", p.RideID, p.Lat, p.Long, p.Timestamp.Format(time.RFC3339Nano))
-}
-
-func (p Position) Distance(from Position) float64 {
-	return haversine.Haversine(from.Long, from.Lat, p.Long, p.Lat)
-}
-
+// NewPosition creates a Position out of a tuple of strings
 func NewPosition(rawRideID, rawLat, rawLong, rawTimestamp string) (Position, error) {
 	rideId, err := strconv.Atoi(rawRideID)
 	if err != nil {
@@ -48,4 +42,9 @@ func NewPosition(rawRideID, rawLat, rawLong, rawTimestamp string) (Position, err
 		Long:      long,
 		Timestamp: timestamp,
 	}, nil
+}
+
+// Distance returns the haversine distance of the given position
+func (p Position) Distance(from Position) float64 {
+	return haversine.Haversine(from.Long, from.Lat, p.Long, p.Lat)
 }

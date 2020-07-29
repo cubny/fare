@@ -1,51 +1,58 @@
-package fairestimation
+package fare
 
 import (
 	"errors"
 	"time"
 )
 
-type Price float32
-
+// Segment is made of two consecutive positions of the same ride
 type Segment struct {
-	p1, p2   Position
-	speed    float64
-	distance float64
-	duration time.Duration
+	rideID     int
+	speed      float64
+	distance   float64
+	duration   time.Duration
+	startedAt  time.Time
+	finishedAt time.Time
 }
 
-func NewSegment(p1, p2 Position) (Segment, error) {
+// NewSegment creates a Segment out of two Positions
+// the maxSpeed is dismiss the outliers
+func NewSegment(p1, p2 Position, maxSpeed float64) (Segment, error) {
 	if p1.RideID != p2.RideID {
 		return Segment{}, errors.New("ride is not the same")
 	}
+	startedAt := p1.Timestamp
+	finishedAt := p2.Timestamp
+
 	distance := p2.Distance(p1)
 
-	duration := p2.Timestamp.Sub(p1.Timestamp)
+	duration := finishedAt.Sub(startedAt)
 	speed := distance / duration.Hours()
-	if speed > 100 {
-		return Segment{}, errors.New("outlier")
+
+	if speed < 0 || speed > maxSpeed {
+		return Segment{}, errors.New("speed is out of range")
 	}
 
 	return Segment{
-		p1:       p1,
-		p2:       p2,
-		speed:    speed,
-		distance: distance,
-		duration: duration,
+		rideID:     p1.RideID,
+		speed:      speed,
+		distance:   distance,
+		duration:   duration,
+		startedAt:  p1.Timestamp,
+		finishedAt: p2.Timestamp,
 	}, nil
 }
 
-func (s Segment) RideID() int {
-	return s.p1.RideID
-}
-
-func (s Segment) FairEst() Price {
+// Fare estimates the fare of segment using business rules
+// it assumes that segment is collected in short duration of time
+// so it does not break the segment into two period of midnight hours and normal hours
+func (s Segment) Fare() Price {
 	switch {
 	case s.speed <= 10:
-		return Price(s.duration.Minutes() / 60 * 11.9)
-	case s.p1.Timestamp.Hour() >= 0 && s.p1.Timestamp.Hour() <= 5:
-		return Price(s.distance * 0.74)
+		return Price(s.duration.Minutes() / 60 * fareIdlePerHour)
+	case s.startedAt.Hour() >= 0 && s.finishedAt.Hour() <= 5:
+		return Price(s.distance * fareMovingMidnight)
 	default:
-		return Price(s.distance * 1.30)
+		return Price(s.distance * fareMovingNormal)
 	}
 }
